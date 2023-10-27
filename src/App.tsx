@@ -11,10 +11,54 @@ import AdvisorScreen from './Component/Advisor/AdvisorScreen';
 import CouncilScreen from './Component/Council/CouncilScreen';
 
 function App() {
-
+  const navigate = useNavigate();
+  interface RootState {
+    userReducer: {
+      role: string;
+      loggedIn: boolean;
+    };
+  }
+  const role = useSelector((state: RootState) => state.userReducer.role)
+  const isLoggedIn = useSelector((state: RootState) => state.userReducer.loggedIn);
+  useEffect(() => {
+    if (isLoggedIn === false || isLoggedIn === null) {
+      navigate("/homepage");
+    }
+  }, [isLoggedIn]);
+  function getScreenComponentByRole(role: string) {
+    switch (role) {
+      case 'student':
+        return <StudentScreen />;
+      case 'advisor':
+        return <AdvisorScreen />;
+      case 'council':
+        return <CouncilScreen />;
+      case 'secretary':
+        return <CouncilScreen />
+      default:
+        return <StudentScreen />;
+    }
+  }
   return (
     <>
-    My app
+      <div>
+        <Routes>
+          <Route path="/homepage" element={<>
+            <Navbar />
+            <HomePage />
+          </>} />
+
+          <Route path="/login_delegation" element={<LoginDelegation />} />
+          <Route path="/login" element={<LoginScreen />} />
+
+          {isLoggedIn ? (
+            <Route path="*" element={<>
+              <Navbar />
+              {getScreenComponentByRole(role)}
+            </>} />
+          ) : null}
+        </Routes>
+      </div>
     </>
   )
 }
